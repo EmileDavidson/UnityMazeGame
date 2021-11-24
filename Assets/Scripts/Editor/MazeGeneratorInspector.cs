@@ -31,6 +31,7 @@ namespace Editor
 
             if (GUILayout.Button("Generate"))
             {
+                _mazeGenerator.ResetMaze(true);
                 _mazeGenerator.StartGeneration();
             }
 

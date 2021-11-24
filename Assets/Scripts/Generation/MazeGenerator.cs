@@ -7,13 +7,15 @@ using UnityEngine.Events;
 public abstract class MazeGenerator : MonoBehaviour
 {
     [Header("Data")]
-    protected List<Cell> Cells = new List<Cell>();
+    [SerializeReference] protected List<Cell> grid = new List<Cell>();
     
     [Header("Settings")]
     [SerializeField] protected int rowAmount;
     [SerializeField] protected int columnAmount;
-    [SerializeField] protected float tileWidth;
-    [SerializeField] protected float tileHeight;
+    [SerializeField] protected float tileScaleX;
+    [SerializeField] protected float tileScaleY;
+    [SerializeField] protected float tileScaleZ;
+    [SerializeField] protected float spacing;
     
     public UnityEvent onStartCreatingHexagons = new UnityEvent();
     public UnityEvent onUpdateCreatingHexagons = new UnityEvent();
@@ -30,6 +32,7 @@ public abstract class MazeGenerator : MonoBehaviour
     public abstract void CreateTiles();
     public abstract void CreateWalls();
     public abstract void GenerateMaze();
+    public abstract List<Cell> GetNeighboursOf(Cell cell);
 
     public void StartGeneration()
     {
@@ -40,12 +43,34 @@ public abstract class MazeGenerator : MonoBehaviour
 
     public virtual void ResetMaze(bool destroyImmediate = false)
     {
-        foreach (var cell in Cells)
+        foreach (var cell in grid)
         {
-            if(destroyImmediate) DestroyImmediate(cell.MyGameObject);
-            else{ Destroy(cell.MyGameObject); }
+            if (cell.MyGameObject != null)
+            {
+                if (destroyImmediate) DestroyImmediate(cell.MyGameObject);
+                else { Destroy(cell.MyGameObject); }
+            }
+
+            foreach (var wall in cell.Walls){
+                if (wall != null)
+                {
+                    if (destroyImmediate) DestroyImmediate(wall);
+                    else { Destroy(wall); }
+                }
+            }
         }
-        Cells = new List<Cell>();
+        grid = new List<Cell>();
+    }
+    
+    public virtual int GetIndexFromGridPosition(int x, int y)
+    {
+        return x + columnAmount * y;
+    }
+
+    //todo: calculate row and colm position from index
+    public virtual Vector2Int GetGridPositionFromindex(int index)
+    {
+        return grid[index].GridPosition;
     }
 }
 

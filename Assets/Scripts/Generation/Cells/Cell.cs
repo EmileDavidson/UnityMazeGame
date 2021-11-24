@@ -6,13 +6,45 @@ using UnityEngine;
 [Serializable]
 public class Cell
 {
-    [SerializeReference] private List<GameObject> walls = new List<GameObject>();
-    [SerializeReference] private GameObject myGameObject;
-    [SerializeReference] private bool visitedByGenerator = false;
+    [SerializeReference] private MazeGenerator _mazeGenerator;
+    [SerializeReference] private List<GameObject> _walls = new List<GameObject>();
+    [SerializeReference] private GameObject _myGameObject;
+    [SerializeReference] private bool _visitedByGenerator = false;
+    [SerializeReference] private Vector2Int _gridPosition;
+
+    public Cell(MazeGenerator mazeGenerator, Vector2Int gridPosition)
+    {
+        this._mazeGenerator = mazeGenerator;
+        this._gridPosition = gridPosition;
+    }
 
     public GameObject MyGameObject
     {
-        get => myGameObject;
-        set => myGameObject = value;
+        get => _myGameObject;
+        set => _myGameObject = value;
+    }
+
+    public bool VisitedByGenerator
+    {
+        get => _visitedByGenerator;
+        set => _visitedByGenerator = value;
+    }
+
+    public List<GameObject> Walls
+    {
+        get => _walls;
+        set => _walls = value;
+    }
+
+    public Vector2Int GridPosition
+    {
+        get => _gridPosition;
+        set => _gridPosition = value;
+    }
+
+    public MazeGenerator MazeGenerator
+    {
+        get => _mazeGenerator;
+        set => _mazeGenerator = value;
     }
 }
