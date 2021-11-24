@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 using Random = System.Random;
 
@@ -13,7 +14,7 @@ namespace Toolbox.MethodExtensions
         /// <param name="target"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static bool IsEmpty<T>(this IList<T> target)
+        public static bool IsEmpty<T>([NotNull] this IList<T> target)
         {
             return target.Count == 0;
         }
