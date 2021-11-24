@@ -53,15 +53,19 @@ public class HexMesh : MonoBehaviour
         int[] tris =
         {
             // top plane
-            0, 1, 2,
-            2, 3, 4,
-            4, 5, 0,
-            0, 2, 4,
+            // 0, 1, 2,
+            // 2, 3, 4,
+            // 4, 5, 0,
+            // 0, 2, 4,
+            0, 1, 5,
+            4, 5, 1,
+            1, 2, 4,
+            3, 4, 2,
             // bottom plane
-            8, 7, 6,
-            10, 9, 8,
-            11, 10, 6,
-            10, 8, 6,
+            11, 7, 6,
+            7, 11, 10,
+            10, 8, 7,
+            8, 10, 9,
             // side 0
             7, 1, 0,
             0, 6, 7,
@@ -111,12 +115,12 @@ public class HexMesh : MonoBehaviour
             new Vector2(0.66f, 0),
             new Vector2(0.33f, 0),
             //
-            new Vector2(0, 0),
-            new Vector2(0, 0),
-            new Vector2(0, 0),
-            new Vector2(0, 0),
-            new Vector2(0, 0),
-            new Vector2(0, 0),
+            new Vector2(1, 0.5f),
+            new Vector2(0.66f, 0),
+            new Vector2(0.33f, 0),
+            new Vector2(0, 0.5f),
+            new Vector2(0.33f, 1),
+            new Vector2(0.66f, 1),
         };
         mesh.uv = uv;
 
