@@ -46,14 +46,11 @@ namespace Editor
             _showDefaultEvents = EditorGUILayout.Foldout(_showDefaultEvents, "Show Default Events");
             if (_showDefaultEvents)
             {
-                int index = 0;
                 foreach (var exclude in _excludes)
                 {
                     
                     var propertyRelative = serializedObject.FindProperty(exclude);
                     EditorGUILayout.PropertyField(propertyRelative);
-
-                    index++;
                 }
             }
             

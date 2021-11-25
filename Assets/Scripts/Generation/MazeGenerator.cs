@@ -16,6 +16,7 @@ public abstract class MazeGenerator : MonoBehaviour
     [SerializeField] protected float tileScaleY;
     [SerializeField] protected float tileScaleZ;
     [SerializeField] protected float spacing;
+    [SerializeField] protected bool wallPerCell; 
     
     public UnityEvent onStartCreatingHexagons = new UnityEvent();
     public UnityEvent onUpdateCreatingHexagons = new UnityEvent();
@@ -67,11 +68,15 @@ public abstract class MazeGenerator : MonoBehaviour
         return x + columnAmount * y;
     }
 
-    //todo: calculate row and colm position from index
-    public virtual Vector2Int GetGridPositionFromindex(int index)
+    public virtual Vector2Int GetGridPositionFromIndex(int index)
     {
         return grid[index].GridPosition;
     }
+
+    public abstract GameObject InstantiateWall(int j, Vector3 center);
+    public abstract GameObject InstantiateTile(Vector3 center, int gridX, int gridY);
+
+    public abstract void IsBorderCell();
 }
 
 
