@@ -131,41 +131,6 @@ public class HexagonMazeGenerator : MazeGenerator
         
         return null;
     }
-    
-    // private void Awake()
-    // {
-    //     Cell cell = grid[10];
-    //     cell.MyGameObject.GetComponent<MeshRenderer>().material.color = new Color(100, 100, 100, 1);
-    //     int topLeft = GetIndexFromGridPosition(cell.GridPosition.x, cell.GridPosition.y - 1);
-    //     int topRight = GetIndexFromGridPosition(cell.GridPosition.x + 1, cell.GridPosition.y - 1);
-    //     int right = GetIndexFromGridPosition(cell.GridPosition.x + 1, cell.GridPosition.y);
-    //     int bottomRight = GetIndexFromGridPosition(cell.GridPosition.x + 1, cell.GridPosition.y + 1);
-    //     int bottomLeft = GetIndexFromGridPosition(cell.GridPosition.x, cell.GridPosition.y + 1);
-    //     int left = GetIndexFromGridPosition(cell.GridPosition.x - 1, cell.GridPosition.y);
-    //     
-    //     Debug.Log(cell.GridPosition);
-    //     if (right <= 0 || right / columnAmount > rowAmount) right = grid.Count - 1;
-    //     if (left == 0 || left > rowAmount) left = grid.Count - 1;
-    //
-    //     Debug.Log(topLeft);
-    //     Debug.Log(topRight);
-    //     Debug.Log(right);
-    //     Debug.Log(bottomRight);
-    //     Debug.Log(bottomLeft);
-    //     Debug.Log(left);
-    //
-    //     var debugging = true;
-    //     if (debugging)
-    //     {
-    //        if(grid[topLeft] != null) grid[topLeft].MyGameObject.GetComponent<MeshRenderer>().material.color = new Color(0, 0, 0, 0);
-    //        if(grid[topRight] != null) grid[topRight].MyGameObject.GetComponent<MeshRenderer>().material.color = new Color(0, 0, 0, 0);
-    //        if(grid[right] != null) grid[right].MyGameObject.GetComponent<MeshRenderer>().material.color = new Color(0, 0, 0, 0);
-    //        if(grid[bottomLeft] != null) grid[bottomLeft].MyGameObject.GetComponent<MeshRenderer>().material.color = new Color(0, 0, 0, 0);
-    //        if(grid[bottomRight] != null) grid[bottomRight].MyGameObject.GetComponent<MeshRenderer>().material.color = new Color(0, 0, 0, 0);
-    //        if (grid[left] != null) grid[left].MyGameObject.GetComponent<MeshRenderer>().material.color = new Color(0, 0, 0, 0);
-    //     }
-    // }
-
 
     public int TEST = 0;
     private void Awake()
@@ -173,8 +138,7 @@ public class HexagonMazeGenerator : MazeGenerator
         Cell cell = grid[TEST];
         cell.MyGameObject.GetComponent<MeshRenderer>().material.color = new Color(.3f, .3f, .3f, 1);
 
-        int index = GetBottomRightNeighbourIndex(cell);
-        Debug.Log(index);
+        int index = GetLeftNeighbourIndex(cell);
         if(grid.ContainsSlot(index)) grid[index].MyGameObject.GetComponent<MeshRenderer>().material.color = new Color(1,1,1);
     }
 
@@ -201,23 +165,33 @@ public class HexagonMazeGenerator : MazeGenerator
         if((cell.GridPosition.x + 1) % rowAmount != 0) rightIndex = GetIndexFromGridPosition(cell.GridPosition.x + 1, cell.GridPosition.y);
         return rightIndex;
     }
-
+    
     public int GetBottomRightNeighbourIndex(Cell cell)
     {
         int bottomRightIndex = -1;
         if(cell.GridPosition.y % 2 == 0) bottomRightIndex = GetIndexFromGridPosition(cell.GridPosition.x, cell.GridPosition.y + 1);
         if(cell.GridPosition.y % 2 != 0) bottomRightIndex = GetIndexFromGridPosition(cell.GridPosition.x + 1, cell.GridPosition.y + 1);
+        
+        if (rowAmount % 2 != 0 && cell.GridPosition.y % 2 != 0 && cell.GridPosition.x + 1 % rowAmount != 0) bottomRightIndex = -1; 
+        if (rowAmount % 2 == 0 && cell.GridPosition.y % 2 != 0 && (cell.GridPosition.x + 1) % rowAmount == 0) bottomRightIndex = -1; 
         return (bottomRightIndex);
     }
-    
-    
-    //todo: NOT WORKING YET!
+
     public int GetBottomLeftNeighbourIndex(Cell cell)
     {
-        int bottomRightIndex = -1;
-        if(cell.GridPosition.y % 2 == 0) bottomRightIndex = GetIndexFromGridPosition(cell.GridPosition.x - 1, cell.GridPosition.y + 1);
-        if(cell.GridPosition.y % 2 != 0) bottomRightIndex = GetIndexFromGridPosition(cell.GridPosition.x , cell.GridPosition.y + 1);
-        return (bottomRightIndex);
+        int bottomLeftIndex = -1;
+        if(cell.GridPosition.y % 2 == 0) bottomLeftIndex = GetIndexFromGridPosition(cell.GridPosition.x - 1, cell.GridPosition.y + 1);
+        if(cell.GridPosition.y % 2 != 0) bottomLeftIndex = GetIndexFromGridPosition(cell.GridPosition.x , cell.GridPosition.y + 1);
+        if (cell.GridPosition.y % 2 == 0 && cell.GridPosition.x % rowAmount == 0) bottomLeftIndex = -1;
+        
+        return (bottomLeftIndex);
+    }
+
+    public int GetLeftNeighbourIndex(Cell cell)
+    {
+        int leftIndex = -1;
+        if(cell.GridPosition.x != 0) leftIndex = GetIndexFromGridPosition(cell.GridPosition.x - 1, cell.GridPosition.y);
+        return leftIndex;
     }
 }
 
