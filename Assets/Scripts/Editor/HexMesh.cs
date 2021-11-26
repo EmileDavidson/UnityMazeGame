@@ -4,24 +4,28 @@ using UnityEngine;
 [System.Serializable]
 public class HexMesh : MonoBehaviour
 {
-    [SerializeField] private float width = 1;
-    [SerializeField] private float height = 1;
+    private float width = 1;
+    private float height = 1;
 
     public void CreateHexagon()
     {
         GameObject hexagon = new GameObject();
         hexagon.name = "Hexagon";
         
-        MeshRenderer meshRenderer = hexagon.AddComponent<MeshRenderer>();
-        meshRenderer.sharedMaterial = new Material(Shader.Find("Standard"));
-        
-        MeshFilter meshFilter = hexagon.AddComponent<MeshFilter>();
-
         Mesh mesh = new Mesh();
 
         mesh = CreateHexagonMesh(mesh);
         mesh.name = "hexagonMesh";
         
+        if (!AssetDatabase.IsValidFolder("Assets/Meshes")) AssetDatabase.CreateFolder("Assets", "Meshes");
+        AssetDatabase.CreateAsset(mesh, "Assets/Meshes/hexagonMesh.asset");
+        AssetDatabase.SaveAssets();
+
+        MeshRenderer meshRenderer = hexagon.AddComponent<MeshRenderer>();
+        meshRenderer.sharedMaterial = new Material(Shader.Find("Standard"));
+        
+        MeshFilter meshFilter = hexagon.AddComponent<MeshFilter>();
+
         MeshCollider meshCollider = hexagon.AddComponent<MeshCollider>();
         meshCollider.sharedMesh = mesh;
         meshCollider.convex = true;
@@ -53,10 +57,6 @@ public class HexMesh : MonoBehaviour
         int[] tris =
         {
             // top plane
-            // 0, 1, 2,
-            // 2, 3, 4,
-            // 4, 5, 0,
-            // 0, 2, 4,
             0, 1, 5,
             4, 5, 1,
             1, 2, 4,
@@ -108,13 +108,14 @@ public class HexMesh : MonoBehaviour
 
         Vector2[] uv =
         {
+            // top plane
             new Vector2(0, 0.5f),
             new Vector2(0.33f, 1),
             new Vector2(0.66f, 1),
             new Vector2(1, 0.5f),
             new Vector2(0.66f, 0),
             new Vector2(0.33f, 0),
-            //
+            // bottom plane
             new Vector2(1, 0.5f),
             new Vector2(0.66f, 0),
             new Vector2(0.33f, 0),
