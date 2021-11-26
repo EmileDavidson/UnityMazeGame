@@ -6,7 +6,6 @@ using UnityEngine;
 [Serializable]
 public class Cell
 {
-    [SerializeReference] private MazeGenerator _mazeGenerator;
     [SerializeReference] private List<GameObject> _walls = new List<GameObject>();
     [SerializeReference] private GameObject _myGameObject;
     [SerializeReference] private bool _visitedByGenerator = false;
@@ -14,7 +13,6 @@ public class Cell
 
     public Cell(MazeGenerator mazeGenerator, Vector2Int gridPosition)
     {
-        this._mazeGenerator = mazeGenerator;
         this._gridPosition = gridPosition;
     }
 
@@ -40,11 +38,5 @@ public class Cell
     {
         get => _gridPosition;
         set => _gridPosition = value;
-    }
-
-    public MazeGenerator MazeGenerator
-    {
-        get => _mazeGenerator;
-        set => _mazeGenerator = value;
     }
 }

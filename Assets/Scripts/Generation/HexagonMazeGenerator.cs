@@ -122,24 +122,35 @@ public class HexagonMazeGenerator : MazeGenerator
     //todo: return list of grid in order of topleft, ropright, right, bottomright, bottomleft, left
     public override List<Cell> GetNeighboursOf(Cell cell)
     {
-        int topLeft = GetIndexFromGridPosition(cell.GridPosition.x , cell.GridPosition.y + 1);
-        int topRight = GetIndexFromGridPosition(cell.GridPosition.x, cell.GridPosition.y);
-        int right = GetIndexFromGridPosition(cell.GridPosition.x, cell.GridPosition.y);
-        int bottomRight = GetIndexFromGridPosition(cell.GridPosition.x, cell.GridPosition.y);
-        int bottomLeft = GetIndexFromGridPosition(cell.GridPosition.x, cell.GridPosition.y);
-        int left = GetIndexFromGridPosition(cell.GridPosition.x, cell.GridPosition.y);
-        
-        return null;
+        int topLeftIndex = GetTopLeftNeighbourIndex(cell);
+        int topRightIndex = GetTopRightNeighbourIndex(cell);
+        int rightIndex = GetRightNeighbourIndex(cell);
+        int bottomRightIndex = GetBottomRightNeighbourIndex(cell);
+        int bottomLeftIndex = GetBottomLeftNeighbourIndex(cell);
+        int leftIndex = GetLeftNeighbourIndex(cell);
+
+        return new List<Cell>(){grid[topLeftIndex], grid[topRightIndex], grid[rightIndex], grid[bottomRightIndex], grid[bottomLeftIndex], grid[leftIndex]};
     }
 
     public int TEST = 0;
     private void Awake()
     {
         Cell cell = grid[TEST];
-        cell.MyGameObject.GetComponent<MeshRenderer>().material.color = new Color(.3f, .3f, .3f, 1);
+        cell.MyGameObject.GetComponent<MeshRenderer>().material.color = new Color(1,1,1, 1);
 
-        int index = GetLeftNeighbourIndex(cell);
-        if(grid.ContainsSlot(index)) grid[index].MyGameObject.GetComponent<MeshRenderer>().material.color = new Color(1,1,1);
+        int topLeftIndex = GetTopLeftNeighbourIndex(cell);
+        int topRightIndex = GetTopRightNeighbourIndex(cell);
+        int rightIndex = GetRightNeighbourIndex(cell);
+        int bottomRightIndex = GetBottomRightNeighbourIndex(cell);
+        int bottomLeftIndex = GetBottomLeftNeighbourIndex(cell);
+        int leftIndex = GetLeftNeighbourIndex(cell);
+        
+        if(grid.ContainsSlot(topLeftIndex)) grid[topLeftIndex].MyGameObject.GetComponent<MeshRenderer>().material.color = new Color(0,0,0,1);
+        if(grid.ContainsSlot(topRightIndex)) grid[topRightIndex].MyGameObject.GetComponent<MeshRenderer>().material.color =  new Color(.5f,0,0,1);
+        if(grid.ContainsSlot(rightIndex)) grid[rightIndex].MyGameObject.GetComponent<MeshRenderer>().material.color =  new Color(1,0,0,1);
+        if(grid.ContainsSlot(bottomRightIndex)) grid[bottomRightIndex].MyGameObject.GetComponent<MeshRenderer>().material.color =  new Color(0,.5f,0,1);
+        if(grid.ContainsSlot(bottomLeftIndex)) grid[bottomLeftIndex].MyGameObject.GetComponent<MeshRenderer>().material.color =  new Color(0,1,0,1);
+        if(grid.ContainsSlot(leftIndex)) grid[leftIndex].MyGameObject.GetComponent<MeshRenderer>().material.color =  new Color(0,0,.5f,1);
     }
 
     public int GetTopLeftNeighbourIndex(Cell cell)
@@ -159,7 +170,7 @@ public class HexagonMazeGenerator : MazeGenerator
         return topRightIndex;
     }
 
-    public int GetRightNeighbour(Cell cell)
+    public int GetRightNeighbourIndex(Cell cell)
     {
         int rightIndex = -1;
         if((cell.GridPosition.x + 1) % rowAmount != 0) rightIndex = GetIndexFromGridPosition(cell.GridPosition.x + 1, cell.GridPosition.y);
