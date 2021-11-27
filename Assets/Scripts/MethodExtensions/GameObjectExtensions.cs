@@ -75,7 +75,7 @@ namespace Toolbox.MethodExtensions
         /// <param name="comp"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns>returns if there was a component</returns>
-        public static bool HasAndGetComponent<T>(this GameObject gameObject, out Component comp) where T : Component
+        public static bool HasAndGetComponent<T>(this GameObject gameObject, out T comp) where T : Component
         {
             comp = gameObject.GetComponent<T>() ? gameObject.GetComponent<T>() : null;
             return comp != null;
