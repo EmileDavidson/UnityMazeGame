@@ -11,19 +11,18 @@ public abstract class MazeGenerator : MonoBehaviour
     [Header("Data")] 
     [SerializeReference] protected Grid2D grid2D;
 
-
     [Header("Settings")] 
     [SerializeField, Min(1)] protected int rowAmount = 1;
     [SerializeField, Min(1)] protected int columnAmount = 1;
-    [SerializeField] protected float tileScaleX = 1;
-    [SerializeField] protected float tileScaleY = 1;
-    [SerializeField] protected float tileScaleZ = 1;
+    [SerializeField] protected Vector3 tileScale = new Vector3(1,1,1);
     [SerializeField] protected float spacing;
-    [SerializeField] protected bool wallPerCell;
+    protected readonly bool wallPerCell = true; //can be [serializedField] and not readonly after function is fixed! 
     [SerializeField] protected bool performanceMode = true;
     [SerializeField, Tooltip("Used for performance mode")] protected Material tileMaterial;
     [SerializeField] protected GameObject tilesParent;
     [SerializeField] protected GameObject wallsParent;
+    [SerializeField] protected GameObject tile;
+    [SerializeField] protected int wallsPerCell = 6;
     
     public UnityEvent onStartCreatingHexagons = new UnityEvent();
     public UnityEvent onUpdateCreatingHexagons = new UnityEvent();
@@ -36,13 +35,13 @@ public abstract class MazeGenerator : MonoBehaviour
     public UnityEvent onStartGeneratingMaze = new UnityEvent();
     public UnityEvent onUpdateGeneratingMaze = new UnityEvent();
     public UnityEvent onFinishGeneratingMaze = new UnityEvent();
-
-    [SerializeReference] public UnityEvent resetMaze = new UnityEvent();
+    
+    public UnityEvent onResetMaze = new UnityEvent();
 
 #if UNITY_EDITOR
     private void OnValidate()
     {
-        if (grid2D == null || grid2D.Cells.IsEmpty()) grid2D = new Grid2D(rowAmount, columnAmount);
+        if (grid2D == null || grid2D.Cells.IsEmpty()) grid2D = new Grid2D(rowAmount, columnAmount, wallsPerCell);
     }
 #endif
 
@@ -51,9 +50,9 @@ public abstract class MazeGenerator : MonoBehaviour
     public abstract void GenerateMaze();
     public abstract List<Cell> GetNeighboursOf(Cell cell);
 
-    public void StartGeneration()
+    public virtual void StartGeneration()
     {
-        grid2D = new Grid2D(rowAmount, columnAmount);
+        grid2D = new Grid2D(rowAmount, columnAmount, wallsPerCell);
         InitializeParents();
         CreateTiles();
         CreateWalls();
@@ -83,34 +82,24 @@ public abstract class MazeGenerator : MonoBehaviour
 
     public virtual void ResetMaze(bool destroyImmediate = false)
     {
-        resetMaze.Invoke();
+        onResetMaze.Invoke();
         grid2D.ForEach(cell =>
         {
             if (cell.MyGameObject != null)
             {
                 if (destroyImmediate) DestroyImmediate(cell.MyGameObject);
-                else
-                {
-                    Destroy(cell.MyGameObject);
-                }
+                else  Destroy(cell.MyGameObject); 
             }
 
-            foreach (var wall in cell.Walls)
+            foreach (var wall in cell.Walls.Where(wall => wall != null))
             {
-                if (wall != null)
-                {
-                    if (destroyImmediate) DestroyImmediate(wall);
-                    else
-                    {
-                        Destroy(wall);
-                    }
-                }
+                if (destroyImmediate) DestroyImmediate(wall);
+                else  Destroy(wall); 
             }
         });
         
         if (Application.isPlaying) { Destroy(tilesParent); }
         if (!Application.isPlaying) { DestroyImmediate(tilesParent); }
-        InitializeParents();
 
         grid2D.Cells = new List<Cell>();
     }
@@ -156,6 +145,6 @@ public abstract class MazeGenerator : MonoBehaviour
         return grid2D[index].GridPosition;
     }
 
-    public abstract GameObject InstantiateWall(int j, Vector3 center);
+    public abstract GameObject InstantiateWall(Vector3 center, Vector3 rotation);
     public abstract GameObject InstantiateTile(Vector3 center, Cell cell);
 }

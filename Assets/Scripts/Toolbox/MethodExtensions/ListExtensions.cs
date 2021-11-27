@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using UnityEngine;
 using Random = System.Random;
 
 namespace Toolbox.MethodExtensions

@@ -8,7 +8,6 @@ namespace Toolbox.Grid
     public class Grid2D
     {
         [SerializeReference] private List<Cell> cells = new List<Cell>();
-
         public List<Cell> Cells
         {
             get => cells;
@@ -21,14 +20,14 @@ namespace Toolbox.Grid
             set => cells[i] = value;
         }
 
-        public Grid2D(int rowAmount, int columnAmount)
+        public Grid2D(int rowAmount, int columnAmount, int wallsPerCell)
         {
             for (int gridY = 0; gridY < rowAmount; gridY++)
             {
                 for (int gridX = 0; gridX < columnAmount; gridX++)
                 {
                     int index = gridX + columnAmount * gridY;
-                    cells.Add(new Cell(new Vector2Int(gridX, gridY), index));
+                    cells.Add(new Cell(new Vector2Int(gridX, gridY), index, wallsPerCell));
                 }
             }
         }

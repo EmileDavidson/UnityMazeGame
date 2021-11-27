@@ -22,7 +22,8 @@ namespace Editor
             "onFinishCreatingWalls",
             "onStartGeneratingMaze",
             "onUpdateGeneratingMaze",
-            "onFinishGeneratingMaze"
+            "onFinishGeneratingMaze",
+            "onResetMaze"
         };
 
         public override void OnInspectorGUI()
@@ -48,7 +49,6 @@ namespace Editor
             {
                 foreach (var exclude in _excludes)
                 {
-                    
                     var propertyRelative = serializedObject.FindProperty(exclude);
                     EditorGUILayout.PropertyField(propertyRelative);
                 }
