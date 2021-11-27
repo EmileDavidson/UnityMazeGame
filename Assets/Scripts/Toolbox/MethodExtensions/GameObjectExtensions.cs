@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Toolbox.MethodExtensions
@@ -75,8 +76,10 @@ namespace Toolbox.MethodExtensions
         /// <param name="comp"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns>returns if there was a component</returns>
-        public static bool HasAndGetComponent<T>(this GameObject gameObject, out T comp) where T : Component
+        public static bool HasAndGetComponent<T>([NotNull] this GameObject gameObject, out T comp) where T : Component
         {
+            comp = null;
+            if (gameObject == null) return false;
             comp = gameObject.GetComponent<T>() ? gameObject.GetComponent<T>() : null;
             return comp != null;
         }

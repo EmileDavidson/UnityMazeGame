@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Generation.Grid
+namespace Toolbox.Grid
 {
     [Serializable]
     public class Cell
     {
         [SerializeReference] private List<GameObject> walls = new List<GameObject>();
         [SerializeReference] private GameObject myGameObject;
+        [SerializeField] private Vector3 position;
         [SerializeReference] private bool visitedByGenerator = false;
         [SerializeReference] public Vector2Int gridPosition;
         [SerializeReference] private int index;
@@ -17,6 +18,12 @@ namespace Generation.Grid
         {
             GridPosition = gridPosition;
             Index = index;
+        }
+
+        public Vector3 Position
+        {
+            get => position;
+            set => position = value;
         }
 
         public GameObject MyGameObject

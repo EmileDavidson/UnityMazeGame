@@ -1,6 +1,7 @@
 
 using System.Collections.Generic;
-using Generation.Grid;
+using System.Linq;
+using Toolbox.Grid;
 using Toolbox.MethodExtensions;
 using UnityEngine;
 using UnityEngine.Events;
@@ -10,6 +11,7 @@ public abstract class MazeGenerator : MonoBehaviour
     [Header("Data")] 
     [SerializeReference] protected Grid2D grid2D;
 
+
     [Header("Settings")] 
     [SerializeField, Min(1)] protected int rowAmount = 1;
     [SerializeField, Min(1)] protected int columnAmount = 1;
@@ -18,7 +20,11 @@ public abstract class MazeGenerator : MonoBehaviour
     [SerializeField] protected float tileScaleZ = 1;
     [SerializeField] protected float spacing;
     [SerializeField] protected bool wallPerCell;
-
+    [SerializeField] protected bool performanceMode = true;
+    [SerializeField, Tooltip("Used for performance mode")] protected Material tileMaterial;
+    [SerializeField] protected GameObject tilesParent;
+    [SerializeField] protected GameObject wallsParent;
+    
     public UnityEvent onStartCreatingHexagons = new UnityEvent();
     public UnityEvent onUpdateCreatingHexagons = new UnityEvent();
     public UnityEvent onFinishCreatingHexagons = new UnityEvent();
@@ -30,6 +36,8 @@ public abstract class MazeGenerator : MonoBehaviour
     public UnityEvent onStartGeneratingMaze = new UnityEvent();
     public UnityEvent onUpdateGeneratingMaze = new UnityEvent();
     public UnityEvent onFinishGeneratingMaze = new UnityEvent();
+
+    [SerializeReference] public UnityEvent resetMaze = new UnityEvent();
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -46,13 +54,36 @@ public abstract class MazeGenerator : MonoBehaviour
     public void StartGeneration()
     {
         grid2D = new Grid2D(rowAmount, columnAmount);
+        InitializeParents();
         CreateTiles();
         CreateWalls();
         GenerateMaze();
+        CombineMeshes();
+    }
+
+    public void InitializeParents()
+    {
+        if (tilesParent == null || tilesParent == default)
+        {
+            tilesParent = new GameObject
+            {
+                transform = { parent = this.transform },
+                name = "TilesParent"
+            };
+        }
+        if (wallsParent == null || tilesParent == default)
+        {
+            wallsParent = new GameObject
+            {
+                transform = { parent = this.transform },
+                name = "WallsParent"
+            };
+        }
     }
 
     public virtual void ResetMaze(bool destroyImmediate = false)
     {
+        resetMaze.Invoke();
         grid2D.ForEach(cell =>
         {
             if (cell.MyGameObject != null)
@@ -76,8 +107,43 @@ public abstract class MazeGenerator : MonoBehaviour
                 }
             }
         });
+        
+        if (Application.isPlaying) { Destroy(tilesParent); }
+        if (!Application.isPlaying) { DestroyImmediate(tilesParent); }
+        InitializeParents();
 
         grid2D.Cells = new List<Cell>();
+    }
+    
+    public virtual void CombineMeshes()
+    {
+        if (!performanceMode) return;
+        if (grid2D.Cells.IsEmpty()) return;
+        
+        List<MeshFilter> meshFilters = new List<MeshFilter>();
+
+        grid2D.ForEach(cell =>
+        {
+            if (!cell.MyGameObject.HasAndGetComponent<MeshFilter>(out var comp)) return;
+            meshFilters.Add(comp);
+        });
+
+        CombineInstance[] combine = new CombineInstance[meshFilters.Count];
+        for (int i = 0; i < meshFilters.Count; i++)
+        {
+            combine[i].mesh = meshFilters[i].sharedMesh;
+            combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
+            if (Application.isPlaying) Destroy(meshFilters[i].gameObject);
+            else { DestroyImmediate(meshFilters[i].gameObject); }
+        }
+
+        MeshFilter meshFilter = tilesParent.GetOrAddComponent<MeshFilter>();
+        MeshRenderer renderer = tilesParent.GetOrAddComponent<MeshRenderer>();
+        meshFilter.sharedMesh = new Mesh();
+        meshFilter.sharedMesh.CombineMeshes(combine);
+        renderer.sharedMaterial = tileMaterial;
+        tilesParent.transform.position = grid2D.Cells.First().Position;
+        tilesParent.gameObject.SetActive(true);
     }
 
     public virtual int GetIndexFromGridPosition(int x, int y)

@@ -10,27 +10,30 @@ namespace Toolbox.MethodExtensions
         /// <summary>
         /// gets closest point from given list of positions
         /// </summary>
+        /// <param name="vector3"></param>
         /// <param name="otherPositions">list of other positions</param>
         /// <returns>the closest point</returns>
         public static Vector3 GetClosest(this Vector3 vector3, IEnumerable<Vector3> otherPositions)
         {
             return otherPositions.OrderBy(trans => Vector3.Distance(trans, vector3)).First();
         }
-    
+
         /// <summary>
         /// gets furthest point from given list of positions
         /// </summary>
+        /// <param name="vector3"></param>
         /// <param name="otherPositions">list of other positions</param>
         /// <returns>the furthest point</returns>
         public static Vector3 GetFurthest(this Vector3 vector3, IEnumerable<Vector3> otherPositions)
         {
             return otherPositions.OrderBy(trans => Vector3.Distance(trans, vector3)).Last();
         }
-            
-            
+
+
         /// <summary>
         /// gets closest point from given list of positions
         /// </summary>
+        /// <param name="vector2"></param>
         /// <param name="otherPositions">list of other positions</param>
         /// <returns>the closest point</returns>
         public static Vector2 GetClosest(this Vector2 vector2, IEnumerable<Vector2> otherPositions)
@@ -41,25 +44,28 @@ namespace Toolbox.MethodExtensions
         /// <summary>
         /// gets furthest point from given list of positions
         /// </summary>
+        /// <param name="vector3"></param>
         /// <param name="otherPositions">list of other positions</param>
         /// <returns>the furthest point</returns>
         public static Vector2 GetFurthest(this Vector2 vector3, IEnumerable<Vector3> otherPositions)
         {
             return otherPositions.OrderBy(trans => Vector2.Distance(trans, vector3)).Last();
         }
-        
+
         /// <summary>
         /// Get the list of positions ordered by closest to furthest  
         /// </summary>
+        /// <param name="vector3"></param>
         /// <param name="otherPositions">list of other positions</param>
         /// <returns>list of ordered position by distance</returns>
         public static Vector3[] GetPositionsByDistance(this Vector3 vector3, IEnumerable<Vector3> otherPositions) {
             return otherPositions.OrderBy(trans => Vector3.Distance(trans, vector3)).ToArray();
         }
-    
+
         /// <summary>
         /// Get the list of positions ordered by closest to furthest  
         /// </summary>
+        /// <param name="vector2"></param>
         /// <param name="otherPositions">list of other positions</param>
         /// <returns>list of ordered position by distance</returns>
         public static Vector2[] GetPositionsByDistance(this Vector2 vector2, IEnumerable<Vector2> otherPositions) {

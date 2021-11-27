@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Generation.Grid
+namespace Toolbox.Grid
 {
     [Serializable]
     public class Grid2D
