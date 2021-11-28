@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using System.Linq;
 using Toolbox.Grid;
@@ -9,7 +8,9 @@ using UnityEngine.Events;
 public abstract class MazeGenerator : MonoBehaviour
 {
     [Header("Data")] 
-    [SerializeReference] protected Grid2D grid2D;
+    [SerializeReference, HideInInspector] protected Grid2D grid2D;
+    [SerializeField] protected List<Cell> steps = new List<Cell>();
+    [SerializeField, Min(0)] protected int currentCellIndex;
 
     [Header("Settings")] 
     [SerializeField, Min(1)] protected int rowAmount = 1;
@@ -44,7 +45,7 @@ public abstract class MazeGenerator : MonoBehaviour
         if (grid2D == null || grid2D.Cells.IsEmpty()) grid2D = new Grid2D(rowAmount, columnAmount, wallsPerCell);
     }
 #endif
-
+    
     public abstract void CreateTiles();
     public abstract void CreateWalls();
     public abstract void GenerateMaze();
@@ -101,7 +102,9 @@ public abstract class MazeGenerator : MonoBehaviour
         if (Application.isPlaying) { Destroy(tilesParent); }
         if (!Application.isPlaying) { DestroyImmediate(tilesParent); }
 
+        steps = new List<Cell>();
         grid2D.Cells = new List<Cell>();
+        currentCellIndex = 0;
     }
     
     public virtual void CombineMeshes()

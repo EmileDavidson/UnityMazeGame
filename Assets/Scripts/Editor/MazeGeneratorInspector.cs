@@ -32,7 +32,7 @@ namespace Editor
 
             if (GUILayout.Button("Generate"))
             {
-                _mazeGenerator.ResetMaze(true);
+                _mazeGenerator.ResetMaze(!Application.isPlaying);
                 _mazeGenerator.StartGeneration();
             }
 
