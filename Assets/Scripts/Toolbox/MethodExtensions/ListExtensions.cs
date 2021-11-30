@@ -90,8 +90,7 @@ namespace Toolbox.MethodExtensions
         {
             if (index < 0) index = list.Count + index;
             else if (index > list.Count - 1) index = index % list.Count;
-
-            list.Insert(index, item);
+            list[index] = item;
         }
 
         /// <summary>

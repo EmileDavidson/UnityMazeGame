@@ -1,30 +1,44 @@
 using System.Collections.Generic;
 using System.Linq;
 using Toolbox.Grid;
-using Toolbox.MethodExtensions;
+using Toolbox.Utility;
 using UnityEngine;
 using UnityEngine.Events;
 
 public abstract class MazeGenerator : MonoBehaviour
 {
-    [Header("Data")] 
-    [SerializeReference, HideInInspector] protected Grid2D grid2D;
-    [SerializeField] protected List<Cell> steps = new List<Cell>();
-    [SerializeField, Min(0)] protected int currentCellIndex;
+    [Header("Debugging")] [SerializeField] protected bool debugging = true;
+    [SerializeField] protected int debuggingIndex = 0;
 
-    [Header("Settings")] 
-    [SerializeField, Min(1)] protected int rowAmount = 1;
+    [Header("Data")] [SerializeReference, HideInInspector]
+    protected Grid2D grid2D;
+
+    protected List<Cell> Steps = new List<Cell>();
+    [Min(0)] protected int CurrentCellIndex;
+
+    [Header("Settings")] [SerializeField, Min(1)]
+    protected int rowAmount = 1;
+
     [SerializeField, Min(1)] protected int columnAmount = 1;
-    [SerializeField] protected Vector3 tileScale = new Vector3(1,1,1);
+    [SerializeField] protected Vector3 tileScale = new Vector3(1, 1, 1);
     [SerializeField] protected float spacing;
-    protected readonly bool wallPerCell = true; //can be [serializedField] and not readonly after function is fixed! 
+
+    [Header("Performance Settings")] [SerializeField]
+    protected bool wallPerCell = true;
+
     [SerializeField] protected bool performanceMode = true;
-    [SerializeField, Tooltip("Used for performance mode")] protected Material tileMaterial;
+
+    [Header("GameObject and GameObjects Settings")] [SerializeField, Tooltip("Used for performance mode")]
+    protected Material tileMaterial;
+
+    [SerializeField, Tooltip("Used for performance mode")]
+    protected Material wallMaterial;
+
     [SerializeField] protected GameObject tilesParent;
     [SerializeField] protected GameObject wallsParent;
-    [SerializeField] protected GameObject tile;
+    [SerializeField] protected GameObject cellTile;
     [SerializeField] protected int wallsPerCell = 6;
-    
+
     public UnityEvent onStartCreatingHexagons = new UnityEvent();
     public UnityEvent onUpdateCreatingHexagons = new UnityEvent();
     public UnityEvent onFinishCreatingHexagons = new UnityEvent();
@@ -36,16 +50,10 @@ public abstract class MazeGenerator : MonoBehaviour
     public UnityEvent onStartGeneratingMaze = new UnityEvent();
     public UnityEvent onUpdateGeneratingMaze = new UnityEvent();
     public UnityEvent onFinishGeneratingMaze = new UnityEvent();
-    
+
     public UnityEvent onResetMaze = new UnityEvent();
 
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        if (grid2D == null || grid2D.Cells.IsEmpty()) grid2D = new Grid2D(rowAmount, columnAmount, wallsPerCell);
-    }
-#endif
-    
+
     public abstract void CreateTiles();
     public abstract void CreateWalls();
     public abstract void GenerateMaze();
@@ -54,11 +62,18 @@ public abstract class MazeGenerator : MonoBehaviour
     public virtual void StartGeneration()
     {
         grid2D = new Grid2D(rowAmount, columnAmount, wallsPerCell);
+        if (cellTile == null)
+        {
+            Debug.LogError("You have to select a tile for the maze");
+            return;
+        }
+
         InitializeParents();
         CreateTiles();
         CreateWalls();
         GenerateMaze();
-        CombineMeshes();
+        CombineTileMeshes();
+        CombineWallMeshes();
     }
 
     public void InitializeParents()
@@ -71,6 +86,7 @@ public abstract class MazeGenerator : MonoBehaviour
                 name = "TilesParent"
             };
         }
+
         if (wallsParent == null || tilesParent == default)
         {
             wallsParent = new GameObject
@@ -89,53 +105,65 @@ public abstract class MazeGenerator : MonoBehaviour
             if (cell.MyGameObject != null)
             {
                 if (destroyImmediate) DestroyImmediate(cell.MyGameObject);
-                else  Destroy(cell.MyGameObject); 
+                else Destroy(cell.MyGameObject);
             }
 
             foreach (var wall in cell.Walls.Where(wall => wall != null))
             {
                 if (destroyImmediate) DestroyImmediate(wall);
-                else  Destroy(wall); 
+                else Destroy(wall);
             }
         });
-        
-        if (Application.isPlaying) { Destroy(tilesParent); }
-        if (!Application.isPlaying) { DestroyImmediate(tilesParent); }
 
-        steps = new List<Cell>();
-        grid2D.Cells = new List<Cell>();
-        currentCellIndex = 0;
-    }
-    
-    public virtual void CombineMeshes()
-    {
-        if (!performanceMode) return;
-        if (grid2D.Cells.IsEmpty()) return;
-        
-        List<MeshFilter> meshFilters = new List<MeshFilter>();
-
-        grid2D.ForEach(cell =>
+        if (Application.isPlaying)
         {
-            if (!cell.MyGameObject.HasAndGetComponent<MeshFilter>(out var comp)) return;
-            meshFilters.Add(comp);
-        });
-
-        CombineInstance[] combine = new CombineInstance[meshFilters.Count];
-        for (int i = 0; i < meshFilters.Count; i++)
-        {
-            combine[i].mesh = meshFilters[i].sharedMesh;
-            combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
-            if (Application.isPlaying) Destroy(meshFilters[i].gameObject);
-            else { DestroyImmediate(meshFilters[i].gameObject); }
+            Destroy(tilesParent);
         }
 
-        MeshFilter meshFilter = tilesParent.GetOrAddComponent<MeshFilter>();
-        MeshRenderer renderer = tilesParent.GetOrAddComponent<MeshRenderer>();
-        meshFilter.sharedMesh = new Mesh();
-        meshFilter.sharedMesh.CombineMeshes(combine);
-        renderer.sharedMaterial = tileMaterial;
-        tilesParent.transform.position = grid2D.Cells.First().Position;
-        tilesParent.gameObject.SetActive(true);
+        if (!Application.isPlaying)
+        {
+            DestroyImmediate(tilesParent);
+        }
+
+        if (Application.isPlaying)
+        {
+            Destroy(wallsParent);
+        }
+
+        if (!Application.isPlaying)
+        {
+            DestroyImmediate(wallsParent);
+        }
+
+        Steps = new List<Cell>();
+        grid2D.Cells = new List<Cell>();
+        CurrentCellIndex = 0;
+    }
+
+    public virtual void CombineTileMeshes()
+    {
+        if (!performanceMode) return;
+        List<GameObject> gameObjects = new List<GameObject>();
+        foreach (var cell in grid2D.Cells.Where(linqCell => linqCell != null && linqCell.MyGameObject != null))
+        {
+            gameObjects.Add(cell.MyGameObject);
+        }
+
+        MyMeshUtility.CombineMeshes(gameObjects, tilesParent, tileMaterial);
+        tilesParent.transform.position = grid2D[0].Position;
+    }
+
+    public void CombineWallMeshes()
+    {
+        if (!performanceMode) return;
+        List<GameObject> gameObjects = (
+            from cell in grid2D.Cells.Where(linqCell => linqCell is { Walls: { } })
+            from wall in cell.Walls
+            where wall != null
+            select wall).ToList();
+
+        MyMeshUtility.CombineMeshes(gameObjects, wallsParent, wallMaterial);
+        tilesParent.transform.position = grid2D[0].Position;
     }
 
     public virtual int GetIndexFromGridPosition(int x, int y)
