@@ -11,29 +11,27 @@ public abstract class MazeGenerator : MonoBehaviour
     [Header("Debugging")] [SerializeField] protected bool debugging = true;
     [SerializeField] protected int debuggingIndex = 0;
 
-    [Header("Data")] [SerializeReference, HideInInspector]
-    protected Grid2D grid2D;
-
-    protected List<Cell> Steps = new List<Cell>();
+    [Header("Data")] 
+    [SerializeReference, HideInInspector] protected Grid2D grid2D;
+    [HideInInspector] protected List<Cell> Steps = new List<Cell>();
     [Min(0)] protected int CurrentCellIndex;
 
-    [Header("Settings")] [SerializeField, Min(1)]
-    protected int rowAmount = 1;
-
+    [Header("Settings")]
+    [SerializeField, Min(1)] protected int rowAmount = 1;
     [SerializeField, Min(1)] protected int columnAmount = 1;
     [SerializeField] protected Vector3 tileScale = new Vector3(1, 1, 1);
     [SerializeField] protected float spacing;
 
-    [Header("Performance Settings")] [SerializeField]
-    protected bool wallPerCell = true;
-
+    [Header("Performance Settings")] 
+    [SerializeField]protected bool wallPerCell = true;
     [SerializeField] protected bool performanceMode = true;
 
     [Header("GameObject and GameObjects Settings")] [SerializeField, Tooltip("Used for performance mode")]
     protected Material tileMaterial;
-
     [SerializeField, Tooltip("Used for performance mode")]
     protected Material wallMaterial;
+
+    [SerializeField] protected float wallHeight = 3;
 
     [SerializeField] protected GameObject tilesParent;
     [SerializeField] protected GameObject wallsParent;

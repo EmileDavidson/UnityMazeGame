@@ -24,11 +24,11 @@ namespace Toolbox.Utility
         public CombineInstance[] ToCombineInstance()
         {
             CombineInstance[] combine = new CombineInstance[filters.Count];
-            for (int i = 0; i < filters.Count; i++)
+            for (int i = filters.Count / 2; i < filters.Count * 2; i++)
             {
-                if (filters[i] == null) continue;
-                combine[i].mesh = filters[i].sharedMesh;
-                combine[i].transform = filters[i].transform.localToWorldMatrix;
+                if (filters.Get(i) == null) continue;
+                combine[combine.GetPossibleIndex(i - 1)].mesh = filters.Get(i).sharedMesh;
+                combine[combine.GetPossibleIndex(i - 1)].transform = filters.Get(i).transform.localToWorldMatrix;
             }
             return combine;
         }

@@ -24,7 +24,7 @@ public class HexagonMazeGenerator : MazeGenerator
             var posY = 0;
             var posZ = ((cell.GridPosition.x * 2 + tileOffset) * tileScale.z) + (spacing * cell.GridPosition.x);
 
-            InstantiateTile(new Vector3(posX, posY, posZ), cell);
+            GameObject tile = InstantiateTile(new Vector3(posX, posY, posZ), cell);
             onUpdateCreatingHexagons.Invoke();
         });
 
@@ -40,6 +40,7 @@ public class HexagonMazeGenerator : MazeGenerator
 
         cell.MyGameObject = tileObj;
         cell.Position = tileObj.transform.position;
+        
         return tileObj;
     }
 
@@ -66,6 +67,7 @@ public class HexagonMazeGenerator : MazeGenerator
         return positions;
     }
 
+
     public void CreateWallsPerCell()
     {
         grid2D.ForEach(cell =>
@@ -79,7 +81,7 @@ public class HexagonMazeGenerator : MazeGenerator
                 Vector3 end = positions.Get(i + 1);
                 if (i == 5) end = positions.Get(0);
 
-                var center = new Vector3((start.x + end.x) / 2, (start.y + end.y) / 2 * tileScale.y,
+                var center = new Vector3((start.x + end.x) / 2, 0 + .75f,
                     (start.z + end.z) / 2);
                 var rotation = Quaternion.FromToRotation(Vector3.up, end - start).eulerAngles;
 
@@ -96,12 +98,9 @@ public class HexagonMazeGenerator : MazeGenerator
 
     public void CreateWallsAroundCells()
     {
-        //todo making it so there is only one wall per connection instead of around all cells so we have around 50% less GameObjects in scene.
-
         grid2D.ForEach(cell =>
         {
             var positions = GetTileVertices(cell);
-            var neighbours = GetNeighboursOf(cell).GetRange(0, 6);
             for (int i = 0; i < 6; i++)
             {
                 if (cell.Walls[i] != null) continue;
@@ -111,8 +110,7 @@ public class HexagonMazeGenerator : MazeGenerator
 
                 if (i == 5) end = positions.Get(0);
 
-                var center = new Vector3((start.x + end.x) / 2, (start.y + end.y) / 2 * tileScale.y,
-                    (start.z + end.z) / 2);
+                var center = new Vector3((start.x + end.x) / 2, 0, (start.z + end.z) / 2);
                 var rotation = Quaternion.FromToRotation(Vector3.up, end - start).eulerAngles;
 
                 GameObject wallObj = InstantiateWall(center, rotation);
@@ -144,7 +142,11 @@ public class HexagonMazeGenerator : MazeGenerator
         GameObject wallObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
         wallObj.transform.position = center;
         wallObj.transform.parent = wallsParent.transform;
-        wallObj.transform.localScale = new Vector3(tileScale.x + .16f, .1f, .1f);
+        wallObj.transform.localScale = new Vector3(tileScale.x + .16f, wallHeight, .1f);
+        
+        var transformPosition = wallObj.transform.position;
+        transformPosition.y = wallHeight / 2;
+        wallObj.transform.position = transformPosition;
 
         var transformRotation = wallObj.transform.rotation;
         transformRotation.eulerAngles = new Vector3(0, rotation.y, 0);

@@ -79,6 +79,14 @@ namespace Toolbox.MethodExtensions
             return list[index];
         }
 
+        public static int GetPossibleIndex<T>(this IList<T> list, int index)
+        {
+            if (index < 0) index = list.Count + index;
+            else if (index > list.Count - 1) index = index % list.Count;
+
+            return index;
+        }
+
         /// <summary>
         /// 
         /// </summary>
