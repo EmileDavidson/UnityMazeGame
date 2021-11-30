@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Toolbox.Grid;
+using Toolbox.MethodExtensions;
 using Toolbox.Utility;
 using UnityEngine;
 using UnityEngine.Events;
@@ -143,26 +144,26 @@ public abstract class MazeGenerator : MonoBehaviour
     public virtual void CombineTileMeshes()
     {
         if (!performanceMode) return;
-        List<GameObject> gameObjects = new List<GameObject>();
-        foreach (var cell in grid2D.Cells.Where(linqCell => linqCell != null && linqCell.MyGameObject != null))
-        {
-            gameObjects.Add(cell.MyGameObject);
-        }
+        List<MeshFilter> filters = (
+            from cell in grid2D.Cells.Where(linqCell =>
+                linqCell != null && linqCell.MyGameObject != null && linqCell.MyGameObject.HasComponent<MeshFilter>())
+            select cell.MyGameObject.GetComponent<MeshFilter>()
+        ).ToList();
 
-        MyMeshUtility.CombineMeshes(gameObjects, tilesParent, tileMaterial);
+        MyMeshUtility.CombineMeshes(filters, tilesParent, tileMaterial);
         tilesParent.transform.position = grid2D[0].Position;
     }
 
     public void CombineWallMeshes()
     {
         if (!performanceMode) return;
-        List<GameObject> gameObjects = (
+        List<MeshFilter> filters = (
             from cell in grid2D.Cells.Where(linqCell => linqCell is { Walls: { } })
             from wall in cell.Walls
-            where wall != null
-            select wall).ToList();
+            where wall != null && wall.HasComponent<MeshFilter>()
+            select wall.GetComponent<MeshFilter>()).ToList();
 
-        MyMeshUtility.CombineMeshes(gameObjects, wallsParent, wallMaterial);
+        MyMeshUtility.CombineMeshes(filters, wallsParent, wallMaterial);
         tilesParent.transform.position = grid2D[0].Position;
     }
 
