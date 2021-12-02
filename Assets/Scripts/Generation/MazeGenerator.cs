@@ -11,24 +11,28 @@ public abstract class MazeGenerator : MonoBehaviour
     [Header("Debugging")] [SerializeField] protected bool debugging = true;
     [SerializeField] protected int debuggingIndex = 0;
 
-    [Header("Data")] 
-    [SerializeReference, HideInInspector] protected Grid2D grid2D;
+    [Header("Data")] [SerializeReference, HideInInspector]
+    protected Grid2D grid2D;
+
     public Grid2D Grid2D => grid2D;
     [HideInInspector] protected List<Cell> Steps = new List<Cell>();
     [Min(0)] protected int CurrentCellIndex;
 
-    [Header("Settings")]
-    [SerializeField, Min(1)] protected int rowAmount = 1;
+    [Header("Settings")] [SerializeField, Min(1)]
+    protected int rowAmount = 1;
+
     [SerializeField, Min(1)] protected int columnAmount = 1;
     [SerializeField] protected Vector3 tileScale = new Vector3(1, 1, 1);
     [SerializeField] protected float spacing;
 
-    [Header("Performance Settings")] 
-    [SerializeField]protected bool wallPerCell = true;
+    [Header("Performance Settings")] [SerializeField]
+    protected bool wallPerCell = true;
+
     [SerializeField] protected bool performanceMode = true;
 
     [Header("GameObject and GameObjects Settings")] [SerializeField, Tooltip("Used for performance mode")]
     protected Material tileMaterial;
+
     [SerializeField, Tooltip("Used for performance mode")]
     protected Material wallMaterial;
 
@@ -106,36 +110,19 @@ public abstract class MazeGenerator : MonoBehaviour
         onResetMaze.Invoke();
         grid2D.ForEach(cell =>
         {
-            if (cell.MyGameObject != null)
-            {
-                if (destroyImmediate) DestroyImmediate(cell.MyGameObject);
-                else Destroy(cell.MyGameObject);
-            }
-
-            foreach (var wall in cell.WallsObjects.Where(wall => wall != null))
-            {
-                if (destroyImmediate) DestroyImmediate(wall);
-                else Destroy(wall);
-            }
+            DestroyTile(cell);
+            DestroyAllWalls(cell);
         });
 
         if (Application.isPlaying)
         {
             Destroy(tilesParent);
-        }
-
-        if (!Application.isPlaying)
-        {
-            DestroyImmediate(tilesParent);
-        }
-
-        if (Application.isPlaying)
-        {
             Destroy(wallsParent);
         }
 
         if (!Application.isPlaying)
         {
+            DestroyImmediate(tilesParent);
             DestroyImmediate(wallsParent);
         }
 
@@ -143,6 +130,24 @@ public abstract class MazeGenerator : MonoBehaviour
         grid2D.Cells = new List<Cell>();
         CurrentCellIndex = 0;
     }
+
+    private void DestroyTile(Cell cell, bool destroyImmediate = false)
+    {
+        if (cell.MyGameObject == null) return;
+        if (destroyImmediate) DestroyImmediate(cell.MyGameObject);
+        else Destroy(cell.MyGameObject);
+    }
+
+    private void DestroyAllWalls(Cell cell, bool destroyImmediate = false)
+    {
+        if (cell.WallsObjects == null) return;
+        foreach (var wall in cell.WallsObjects.Where(wall => wall != null))
+        {
+            if (destroyImmediate) DestroyImmediate(wall);
+            else Destroy(wall);
+        }
+    }
+
 
     public virtual void CombineTileMeshes()
     {
@@ -170,7 +175,7 @@ public abstract class MazeGenerator : MonoBehaviour
         tilesParent.transform.position = grid2D[0].Position;
     }
 
-    public virtual int GetIndexFromGridPosition(int x, int y)
+    protected virtual int GetIndexFromGridPosition(int x, int y)
     {
         return x + columnAmount * y;
     }
@@ -182,4 +187,6 @@ public abstract class MazeGenerator : MonoBehaviour
 
     public abstract GameObject InstantiateWall(Vector3 center, Vector3 rotation);
     public abstract GameObject InstantiateTile(Vector3 center, Cell cell);
+
+    public abstract int GetWallIndexFromTo(Cell cell1, Cell cell2);
 }
