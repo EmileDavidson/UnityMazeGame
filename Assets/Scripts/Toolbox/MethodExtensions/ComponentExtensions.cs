@@ -77,7 +77,7 @@ namespace Toolbox.MethodExtensions
 
             foreach (GameObject child in childGameObjects)
             {
-                if (child.HasAndGetComponent<T>(out var comp))
+                if (child.TryGetComponent<T>(out var comp))
                 {
                     components.Add(comp);
                     continue;

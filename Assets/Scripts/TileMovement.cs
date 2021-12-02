@@ -45,14 +45,14 @@ public class TileMovement : MonoBehaviour
         circleAngle = (Mathf.Atan2(normalizedClick.y, normalizedClick.x) * 180 / Mathf.PI) + 180;
         _currentDirection = GetDirection(circleAngle);
 
-        int wallIndex = _generator.GetWallFromTo(_currentCell, getCellFromDirection(_currentDirection));
+        int wallIndex = _generator.GetWallFromTo(_currentCell, GetCellFromDirection(_currentDirection));
         foreach (var VARIABLE in _currentCell.Walls)
         {
             print(VARIABLE) ;
         }
     }
 
-    Cell getCellFromDirection(MovementDirections dir)
+    Cell GetCellFromDirection(MovementDirections dir)
     {
         int tileIndex = 0;
         switch (dir)

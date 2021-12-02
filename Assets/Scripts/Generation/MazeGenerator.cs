@@ -72,8 +72,12 @@ public abstract class MazeGenerator : MonoBehaviour
         CreateTiles();
         CreateWalls();
         GenerateMaze();
-        CombineTileMeshes();
-        CombineWallMeshes();
+
+        if (performanceMode)
+        {
+            CombineTileMeshes();
+            CombineWallMeshes();
+        }
     }
 
     public void InitializeParents()

@@ -8,15 +8,6 @@ using Random = UnityEngine.Random;
 
 public class HexagonMazeGenerator : MazeGenerator
 {
-    private void Start()
-    {
-        grid2D.ForEach(cell =>
-        {
-            GetTopLeftNeighbourIndex(cell);
-            GetNeighboursOf(cell);
-        });
-    }
-
     public override void CreateTiles()
     {
         if (cellTile == null) return;
@@ -102,10 +93,6 @@ public class HexagonMazeGenerator : MazeGenerator
         });
     }
 
-    private void Awake()
-    {
-    }
-
     public void CreateWallsAroundCells()
     {
         grid2D.ForEach(cell =>
@@ -163,6 +150,8 @@ public class HexagonMazeGenerator : MazeGenerator
         var transformRotation = wallObj.transform.rotation;
         transformRotation.eulerAngles = new Vector3(0, rotation.y, 0);
         wallObj.transform.localRotation = transformRotation;
+        
+        if (wallObj.TryGetComponent<Renderer>(out var comp) && wallMaterial != null) comp.material = wallMaterial;
 
         return wallObj;
     }
@@ -271,12 +260,14 @@ public class HexagonMazeGenerator : MazeGenerator
     public void DebugNeighbours()
     {
         if (performanceMode) return;
+        
         var neighbours = GetNeighboursOf(grid2D[debuggingIndex]);
 
         grid2D.ForEach((cell =>
         {
             if (cell.MyGameObject == null) return;
-            cell.MyGameObject.GetComponent<Renderer>().material.color = new Color(0, 0, 0, 1);
+            if (tileMaterial == null) cell.MyGameObject.GetComponent<Renderer>().material.color = new Color(0, 0, 0, 1);
+            else cell.MyGameObject.GetComponent<Renderer>().material = tileMaterial;
         }));
 
         if (neighbours[0]?.MyGameObject != null)
@@ -304,7 +295,7 @@ public class HexagonMazeGenerator : MazeGenerator
         int bottomRightIndex = GetBottomRightNeighbourIndex(cell);
         int bottomLeftIndex = GetBottomLeftNeighbourIndex(cell);
         int leftIndex = GetLeftNeighbourIndex(cell);
-
+        
         var list = new List<Cell>
         {
             grid2D.Cells.ContainsSlot(topLeftIndex) ? grid2D[topLeftIndex] : null,
@@ -351,10 +342,10 @@ public class HexagonMazeGenerator : MazeGenerator
         int rightIndex = -1;
         rightIndex = GetIndexFromGridPosition(cell.GridPosition.x + 1, cell.GridPosition.y);
 
-        if (!grid2D.IsBorder(cell, out var borderType)) return rightIndex;
+        grid2D.IsBorder(cell, out var borderType);
         grid2D.IsCorner(cell, out var cornerType);
-        if (borderType == BorderType.BorderRight || cornerType == CornerType.BottomRightCorner ||
-            cornerType == CornerType.TopRightCorner) rightIndex = -1;
+
+        if (borderType == BorderType.BorderRight || cornerType == CornerType.BottomRightCorner || cornerType == CornerType.TopRightCorner) rightIndex = -1;
         return rightIndex;
     }
 
@@ -383,7 +374,7 @@ public class HexagonMazeGenerator : MazeGenerator
         if (type == BorderType.BorderLeft && cell.GridPosition.y % 2 == 0) bottomLeftIndex = -1;
         if (cornerType == CornerType.BottomLeftCorner) bottomLeftIndex = -1;
 
-        return (bottomLeftIndex);
+        return bottomLeftIndex;
     }
 
     public int GetLeftNeighbourIndex(Cell cell)
@@ -391,10 +382,9 @@ public class HexagonMazeGenerator : MazeGenerator
         int leftIndex = -1;
         leftIndex = GetIndexFromGridPosition(cell.GridPosition.x - 1, cell.GridPosition.y);
 
-        if (!grid2D.IsBorder(cell, out var borderType)) return leftIndex;
+        grid2D.IsBorder(cell, out var borderType);
         grid2D.IsCorner(cell, out var cornerType);
-        if (borderType == BorderType.BorderLeft || cornerType == CornerType.BottomLeftCorner ||
-            cornerType == CornerType.TopLeftCorner) leftIndex = -1;
+        if (borderType == BorderType.BorderLeft || cornerType == CornerType.BottomLeftCorner || cornerType == CornerType.TopLeftCorner) leftIndex = -1;
 
         return leftIndex;
     }
