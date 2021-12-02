@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using Toolbox.Grid;
 using Toolbox.MethodExtensions;
 using UnityEngine;
@@ -158,7 +159,6 @@ public class HexagonMazeGenerator : MazeGenerator
 
     public override void GenerateMaze()
     {
-        // return;
         onStartGeneratingMaze.Invoke();
         
         bool finished = !OptionsLeft();
@@ -196,8 +196,8 @@ public class HexagonMazeGenerator : MazeGenerator
 
     public void RemoveWallsBetween(Cell cell1, Cell cell2)
     {
-        int wallIndex1 = GetWallFromTo(cell1, cell2);
-        int wallIndex2 = GetWallFromTo(cell2, cell1);
+        int wallIndex1 = GetWallIndexFromTo(cell1, cell2);
+        int wallIndex2 = GetWallIndexFromTo(cell2, cell1);
         
         grid2D[cell1.Index].Walls.SetAt(wallIndex1, false);
         grid2D[cell2.Index].Walls.SetAt(wallIndex2, false);
@@ -211,11 +211,9 @@ public class HexagonMazeGenerator : MazeGenerator
 
         Destroy(grid2D[cell1.Index].WallsObjects.ToList().Get(wallIndex1));
         Destroy(grid2D[cell2.Index].WallsObjects.ToList().Get(wallIndex2));
-        
-
     }
 
-    public int GetWallFromTo(Cell cell1, Cell cell2)
+    public override int GetWallIndexFromTo([NotNull] Cell cell1, [NotNull] Cell cell2)
     {
         var cell1Neighbours = GetNeighboursOf(grid2D[cell2.Index]);
         var wallDirection = -1;
@@ -228,7 +226,7 @@ public class HexagonMazeGenerator : MazeGenerator
             break;
         }
 
-        int wallIndex1 = wallDirection + 3;
+        int wallIndex1 = (wallDirection + 3).GetNumberBetweenList(cell1.Walls);
 
         return wallIndex1;
     }
