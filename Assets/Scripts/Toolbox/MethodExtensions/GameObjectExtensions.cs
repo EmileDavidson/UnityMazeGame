@@ -69,33 +69,6 @@ namespace Toolbox.MethodExtensions
             return true;
         }
 
-        /// <summary>
-        /// checks if object has component and returns that and out's the component
-        /// </summary>
-        /// <param name="gameObject"></param>
-        /// <param name="comp"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns>returns if there was a component</returns>
-        public static bool HasAndGetComponent<T>([NotNull] this GameObject gameObject, out T comp) where T : Component
-        {
-            comp = null;
-            if (gameObject == null) return false;
-            comp = gameObject.GetComponent<T>() ? gameObject.GetComponent<T>() : null;
-            return comp != null;
-        }
-        
-        /// <summary>
-        /// checks if object parent has component and returns that and out's the component
-        /// </summary>
-        /// <param name="gameObject"></param>
-        /// <param name="comp"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns>returns if there was a component</returns>
-        public static bool HasAndGetComponentInParent<T>(this GameObject gameObject, out Component comp) where T : Component
-        {
-            comp = gameObject.GetComponentInParent<T>() ? gameObject.GetComponentInParent<T>() : null;
-            return comp != null;
-        }
 
         /// <summary>
         /// gets or add script from / to add children of GameObject and returns the list of components
@@ -110,7 +83,7 @@ namespace Toolbox.MethodExtensions
 
             foreach (GameObject child in childGameObjects)
             {
-                if (child.HasAndGetComponent<T>(out var comp))
+                if (child.TryGetComponent<T>(out var comp))
                 {
                     components.Add(comp);
                     continue;
