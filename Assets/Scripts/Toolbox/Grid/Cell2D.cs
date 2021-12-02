@@ -7,7 +7,8 @@ namespace Toolbox.Grid
     [Serializable]
     public class Cell
     {
-        [SerializeReference] private GameObject[] walls;
+        [SerializeReference] private GameObject[] wallsObjects;
+        [SerializeReference] private bool[] walls;
         [SerializeReference] private GameObject myGameObject;
         [SerializeField] private Vector3 position;
         [SerializeReference] private bool visitedByGenerator = false;
@@ -18,8 +19,11 @@ namespace Toolbox.Grid
         {
             GridPosition = gridPosition;
             Index = index;
-            walls = new GameObject[wallAmount];
+            wallsObjects = new GameObject[wallAmount];
+            walls = new bool[wallAmount];
         }
+        
+        
 
         public Vector3 Position
         {
@@ -39,7 +43,13 @@ namespace Toolbox.Grid
             set => visitedByGenerator = value;
         }
 
-        public GameObject[] Walls
+        public GameObject[] WallsObjects
+        {
+            get => wallsObjects;
+            set => wallsObjects = value;
+        }
+
+        public bool[] Walls
         {
             get => walls;
             set => walls = value;

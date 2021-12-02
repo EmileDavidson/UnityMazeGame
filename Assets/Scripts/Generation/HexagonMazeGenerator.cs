@@ -8,6 +8,15 @@ using Random = UnityEngine.Random;
 
 public class HexagonMazeGenerator : MazeGenerator
 {
+    private void Start()
+    {
+        grid2D.ForEach(cell =>
+        {
+            GetTopLeftNeighbourIndex(cell);
+            GetNeighboursOf(cell);
+        });
+    }
+
     public override void CreateTiles()
     {
         if (cellTile == null) return;
@@ -87,7 +96,8 @@ public class HexagonMazeGenerator : MazeGenerator
 
                 GameObject wallObj = InstantiateWall(center, rotation);
                 wallObj.name = "wall: " + cell.Index + " ||| " + i;
-                cell.Walls[i] = wallObj;
+                cell.WallsObjects[i] = wallObj;
+                cell.Walls[i] = true;
             }
         });
     }
@@ -103,7 +113,7 @@ public class HexagonMazeGenerator : MazeGenerator
             var positions = GetTileVertices(cell);
             for (int i = 0; i < 6; i++)
             {
-                if (cell.Walls[i] != null) continue;
+                if (cell.WallsObjects[i] != null) continue;
 
                 Vector3 start = positions.Get(i);
                 Vector3 end = positions.Get(i + 1);
@@ -115,7 +125,8 @@ public class HexagonMazeGenerator : MazeGenerator
 
                 GameObject wallObj = InstantiateWall(center, rotation);
                 wallObj.name = "wall: " + cell.Index + " ||| " + i;
-                cell.Walls[i] = wallObj;
+                cell.WallsObjects[i] = wallObj;
+                cell.Walls[i] = true;
 
                 //get neighbour towards wall 
                 int neighbourNumber = i switch
@@ -131,7 +142,8 @@ public class HexagonMazeGenerator : MazeGenerator
 
                 if (grid2D.Cells.ContainsSlot(neighbourNumber))
                 {
-                    grid2D[neighbourNumber].Walls.SetAt(i + 3, wallObj);
+                    grid2D[neighbourNumber].WallsObjects.SetAt(i + 3, wallObj);
+                    cell.Walls.SetAt(i + 3, true);
                 }
             }
         });
@@ -197,16 +209,21 @@ public class HexagonMazeGenerator : MazeGenerator
     {
         int wallIndex1 = GetWallFromTo(cell1, cell2);
         int wallIndex2 = GetWallFromTo(cell2, cell1);
+        
+        grid2D[cell1.Index].Walls.SetAt(wallIndex1, false);
+        grid2D[cell2.Index].Walls.SetAt(wallIndex2, false);
 
         if (!Application.isPlaying)
         {
-            DestroyImmediate(grid2D[cell1.Index].Walls.ToList().Get(wallIndex1));
-            DestroyImmediate(grid2D[cell2.Index].Walls.ToList().Get(wallIndex2));
+            DestroyImmediate(grid2D[cell1.Index].WallsObjects.ToList().Get(wallIndex1));
+            DestroyImmediate(grid2D[cell2.Index].WallsObjects.ToList().Get(wallIndex2));
             return;
         }
 
-        Destroy(grid2D[cell1.Index].Walls.ToList().Get(wallIndex1));
-        Destroy(grid2D[cell2.Index].Walls.ToList().Get(wallIndex2));
+        Destroy(grid2D[cell1.Index].WallsObjects.ToList().Get(wallIndex1));
+        Destroy(grid2D[cell2.Index].WallsObjects.ToList().Get(wallIndex2));
+        
+
     }
 
     public int GetWallFromTo(Cell cell1, Cell cell2)

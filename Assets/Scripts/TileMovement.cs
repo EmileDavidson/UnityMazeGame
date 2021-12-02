@@ -1,12 +1,28 @@
-using System;
-using Unity.Collections;
+using Toolbox.Grid;
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using Toolbox.MethodExtensions;
+using Random = UnityEngine.Random;
 
 public class TileMovement : MonoBehaviour
 {
     private Vector3 _screenClickPos;
 
     private MovementDirections _currentDirection;
+    private Cell _currentCell;
+
+    private HexagonMazeGenerator _generator;
+    private List<Cell> _mapCells = new List<Cell>();
+
+    private void Awake()
+    {
+        _generator = FindObjectOfType<HexagonMazeGenerator>();
+        _mapCells = _generator.Grid2D.Cells;
+        
+        _currentCell = _mapCells[Random.Range(0, _mapCells.Count)];
+        transform.position = _currentCell.Position;
+    }
 
     private void Update()
     {
@@ -19,7 +35,7 @@ public class TileMovement : MonoBehaviour
     void OnClick()
     {
         float circleAngle;
-        
+
         Vector3 normalizedClick = new Vector3();
         
         _screenClickPos = Input.mousePosition;
@@ -27,10 +43,43 @@ public class TileMovement : MonoBehaviour
         normalizedClick.y = (_screenClickPos.y / Screen.height - 0.5f) * 2;
 
         circleAngle = (Mathf.Atan2(normalizedClick.y, normalizedClick.x) * 180 / Mathf.PI) + 180;
-        _currentDirection = getDirection(circleAngle);
+        _currentDirection = GetDirection(circleAngle);
+
+        int wallIndex = _generator.GetWallFromTo(_currentCell, getCellFromDirection(_currentDirection));
+        foreach (var VARIABLE in _currentCell.Walls)
+        {
+            print(VARIABLE) ;
+        }
     }
 
-    MovementDirections getDirection(float angle)
+    Cell getCellFromDirection(MovementDirections dir)
+    {
+        int tileIndex = 0;
+        switch (dir)
+        {
+            case MovementDirections.TopRight:
+                tileIndex = _generator.GetTopRightNeighbourIndex(_currentCell);
+                break;
+            case MovementDirections.Right:
+                tileIndex = _generator.GetRightNeighbourIndex(_currentCell);
+                break;
+            case MovementDirections.BottomRight:
+                tileIndex = _generator.GetBottomRightNeighbourIndex(_currentCell);
+                break;
+            case MovementDirections.BottomLeft:
+                tileIndex = _generator.GetBottomLeftNeighbourIndex(_currentCell);
+                break;
+            case MovementDirections.Left:
+                tileIndex = _generator.GetLeftNeighbourIndex(_currentCell);
+                break;
+            case MovementDirections.TopLeft:
+                tileIndex = _generator.GetTopLeftNeighbourIndex(_currentCell);
+                break;
+        }
+        return _mapCells[tileIndex];
+    }
+
+    MovementDirections GetDirection(float angle)
     {
         if (angle < 270 && angle > 210)
         {

@@ -13,6 +13,7 @@ public abstract class MazeGenerator : MonoBehaviour
 
     [Header("Data")] 
     [SerializeReference, HideInInspector] protected Grid2D grid2D;
+    public Grid2D Grid2D => grid2D;
     [HideInInspector] protected List<Cell> Steps = new List<Cell>();
     [Min(0)] protected int CurrentCellIndex;
 
@@ -107,7 +108,7 @@ public abstract class MazeGenerator : MonoBehaviour
                 else Destroy(cell.MyGameObject);
             }
 
-            foreach (var wall in cell.Walls.Where(wall => wall != null))
+            foreach (var wall in cell.WallsObjects.Where(wall => wall != null))
             {
                 if (destroyImmediate) DestroyImmediate(wall);
                 else Destroy(wall);
@@ -156,8 +157,8 @@ public abstract class MazeGenerator : MonoBehaviour
     {
         if (!performanceMode) return;
         List<MeshFilter> filters = (
-            from cell in grid2D.Cells.Where(linqCell => linqCell is { Walls: { } })
-            from wall in cell.Walls
+            from cell in grid2D.Cells.Where(linqCell => linqCell is { WallsObjects: { } })
+            from wall in cell.WallsObjects
             where wall != null && wall.HasComponent<MeshFilter>()
             select wall.GetComponent<MeshFilter>()).ToList();
 
