@@ -52,7 +52,7 @@ namespace Toolbox.Utility
 
             foreach (var filter in filters)
             {
-                if (verticesCount + filter.sharedMesh.vertexCount >= (65535 - 1) / 2)
+                if (verticesCount + filter.sharedMesh.vertexCount >= (65535 - 1))
                 {
                     //create new chunk
                     chunks.Add(new Chunk(new GameObject()));
