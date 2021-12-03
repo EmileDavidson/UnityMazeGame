@@ -134,7 +134,7 @@ public abstract class MazeGenerator : MonoBehaviour
     private void DestroyTile(Cell cell, bool destroyImmediate = false)
     {
         if (cell.MyGameObject == null) return;
-        if (destroyImmediate) DestroyImmediate(cell.MyGameObject);
+        if (destroyImmediate || !Application.isPlaying) DestroyImmediate(cell.MyGameObject);
         else Destroy(cell.MyGameObject);
     }
 
@@ -143,7 +143,7 @@ public abstract class MazeGenerator : MonoBehaviour
         if (cell.WallsObjects == null) return;
         foreach (var wall in cell.WallsObjects.Where(wall => wall != null))
         {
-            if (destroyImmediate) DestroyImmediate(wall);
+            if (destroyImmediate || !Application.isPlaying) DestroyImmediate(wall);
             else Destroy(wall);
         }
     }
