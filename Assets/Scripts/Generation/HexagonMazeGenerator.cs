@@ -76,7 +76,7 @@ public class HexagonMazeGenerator : MazeGenerator
             onUpdateCreatingWalls.Invoke();
             var positions = GetTileVertices(cell);
 
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < wallsPerCell; i++)
             {
                 Vector3 start = positions.Get(i);
                 Vector3 end = positions.Get(i + 1);
@@ -99,7 +99,7 @@ public class HexagonMazeGenerator : MazeGenerator
         grid2D.ForEach(cell =>
         {
             var positions = GetTileVertices(cell);
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < wallsPerCell; i++)
             {
                 if (cell.WallsObjects[i] != null) continue;
 
