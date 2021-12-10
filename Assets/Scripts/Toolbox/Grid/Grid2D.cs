@@ -8,8 +8,21 @@ namespace Toolbox.Grid
     public class Grid2D
     {
         [SerializeReference] private List<Cell> cells = new List<Cell>();
-        public int RowAmount { get; private set; } = 0;
-        public int ColumnAmount { get; private set; } = 0;
+        [SerializeReference] public int RowAmount = 0;
+        [SerializeReference] public int ColumnAmount = 0;
+
+        public int RowAmount1
+        {
+            get => RowAmount;
+            private set => RowAmount = value;
+        }
+
+        public int ColumnAmount1
+        {
+            get => ColumnAmount;
+            private set => ColumnAmount = value;
+        }
+
         public List<Cell> Cells
         {
             get => cells;
