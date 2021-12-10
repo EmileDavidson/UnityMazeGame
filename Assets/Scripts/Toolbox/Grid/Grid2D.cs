@@ -63,7 +63,7 @@ namespace Toolbox.Grid
         
                 if (cell.GridPosition.x == 0)
                 {
-                    type = BorderType.BorderLeft;
+                    type = BorderType.BorderRight;
                     return true;
                 }
         
@@ -81,7 +81,7 @@ namespace Toolbox.Grid
         
                 if (cell.GridPosition.x == ColumnAmount - 1)
                 {
-                    type = BorderType.BorderRight;
+                    type = BorderType.BorderLeft;
                     return true;
                 }
         
