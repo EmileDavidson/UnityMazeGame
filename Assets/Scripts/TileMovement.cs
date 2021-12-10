@@ -49,7 +49,7 @@ public class TileMovement : MonoBehaviour
         
         Debug.Log(_currentCell.Index + ", " + _nextCell.Index);
         
-        int wallIndex = _generator.GetWallFromTo(_currentCell, _nextCell);
+        int wallIndex = _generator.GetWallIndexFromTo(_currentCell, _nextCell);
         bool hasWall = _currentCell.Walls.Get(wallIndex);
 
         if (!hasWall) MoveToTile(_nextCell);
