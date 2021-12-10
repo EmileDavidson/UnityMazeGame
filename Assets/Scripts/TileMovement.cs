@@ -1,6 +1,5 @@
 using Toolbox.Grid;
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using Toolbox.MethodExtensions;
 using Random = UnityEngine.Random;
@@ -11,6 +10,7 @@ public class TileMovement : MonoBehaviour
 
     private MovementDirections _currentDirection;
     private Cell _currentCell;
+    private Cell _nextCell;
 
     private HexagonMazeGenerator _generator;
     private List<Cell> _mapCells = new List<Cell>();
@@ -45,11 +45,20 @@ public class TileMovement : MonoBehaviour
         circleAngle = (Mathf.Atan2(normalizedClick.y, normalizedClick.x) * 180 / Mathf.PI) + 180;
         _currentDirection = GetDirection(circleAngle);
 
-        int wallIndex = _generator.GetWallFromTo(_currentCell, getCellFromDirection(_currentDirection));
-        foreach (var VARIABLE in _currentCell.Walls)
-        {
-            print(VARIABLE) ;
-        }
+        _nextCell = getCellFromDirection(_currentDirection);
+        
+        Debug.Log(_currentCell.Index + ", " + _nextCell.Index);
+        
+        int wallIndex = _generator.GetWallFromTo(_currentCell, _nextCell);
+        bool hasWall = _currentCell.Walls.Get(wallIndex);
+
+        if (!hasWall) MoveToTile(_nextCell);
+    }
+
+    void MoveToTile(Cell tile)
+    {
+        transform.position = tile.Position;
+        _currentCell = tile;
     }
 
     Cell getCellFromDirection(MovementDirections dir)
